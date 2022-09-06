@@ -1,23 +1,23 @@
-#include <SFML/Graphics.hpp>
-#include "game.hh"
+#include "/Users/s/Desktop/Projects/sfml/game/include/game.hh"
 
 const float Game::PlayerSpeed = 100.f;
 const sf::Time Game::TimePerFrame = sf::seconds(1.f / 60.f);
+std::string gameName = "Plane Wars";
 
-Game::Game()
-    : mWindow(sf::VideoMode(640, 480), "Game", sf::Style::Close)
-      , mTexture()
-      , mPlayer()
-      , mFont()
-      , mStatisticsText()
-      , mStatisticsUpdateTime()
-      , mStatisticsNumFrames(0)
-      , mIsMovingUp(false)
-      , mIsMovingDown(false)
-      , mIsMovingLeft(false)
-      , mIsMovingRight(false)
+Game::Game() :
+    mWindow(sf::VideoMode(640, 480), gameName, sf::Style::Close)
+    , mTexture()
+    , mPlayer()
+    , mFont()
+    , mStatisticsText()
+    , mStatisticsUpdateTime()
+    , mStatisticsNumFrames(0)
+    , mIsMovingUp(false)
+    , mIsMovingDown(false)
+    , mIsMovingLeft(false)
+    , mIsMovingRight(false)
 {
-    if (!mTexture.loadFromFile("Media/Textures/Plane.png"))
+    if (!mTexture.loadFromFile("/Users/s/Desktop/Projects/sfml/game/media/textures/plane.png"))
     {
         // Error handling
     }
@@ -25,10 +25,12 @@ Game::Game()
     mPlayer.setTexture(mTexture);
     mPlayer.setPosition(100.f, 100.f);
 
-    mFont.loadFromFile("Media/Sansation.ttf");
+    if (!mFont.loadFromFile("/Users/s/Desktop/Projects/sfml/game/media/Sansation.ttf")) {}
+
     mStatisticsText.setFont(mFont);
     mStatisticsText.setPosition(5.f, 5.f);
     mStatisticsText.setCharacterSize(10);
+
 }
 
 void Game::run()
@@ -46,30 +48,17 @@ void Game::run()
             processEvents();
             update(TimePerFrame);
         }
-
         updateStatistics(elapsedTime);
         render();
     }
 }
 
-void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
-{
-    if (key == sf::Keyboard::Up)
-        mIsMovingUp = isPressed;
-    else if (key == sf::Keyboard::Down)
-        mIsMovingDown = isPressed;
-    else if (key == sf::Keyboard::Left)
-        mIsMovingLeft = isPressed;
-    else if (key == sf::Keyboard::Right)
-        mIsMovingRight = isPressed;
-}
-
-void Game::processEvents() 
+void Game::processEvents()
 {
     sf::Event event;
     while(mWindow.pollEvent(event))
     {
-        switch (event.type)
+        switch(event.type)
         {
             case sf::Event::KeyPressed:
                 handlePlayerInput(event.key.code, true);
@@ -82,6 +71,32 @@ void Game::processEvents()
                 break;
         }
     }
+}
+
+void Game::updateStatistics(sf::Time elapsedTime)
+{
+    mStatisticsUpdateTime += elapsedTime;
+    mStatisticsNumFrames += 1;
+    if (mStatisticsUpdateTime > sf::seconds(1.0f))
+    {
+        mStatisticsText.setString("Frames / Second = " + std::to_string(mStatisticsNumFrames) +
+                "\n" +
+                "Time / Update = " + std::to_string(mStatisticsUpdateTime.asMicroseconds() / mStatisticsNumFrames) + " us");
+        mStatisticsUpdateTime -= sf::seconds(1.0f);
+        mStatisticsNumFrames = 0;
+    }
+}
+
+void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
+{
+    if (key == sf::Keyboard::Up)
+        mIsMovingUp = isPressed;
+    if (key == sf::Keyboard::Down)
+        mIsMovingDown = isPressed;
+    if (key == sf::Keyboard::Left)
+        mIsMovingLeft = isPressed;
+    if (key == sf::Keyboard::Right)
+        mIsMovingRight = isPressed;
 }
 
 void Game::update(sf::Time deltaTime)
@@ -99,33 +114,11 @@ void Game::update(sf::Time deltaTime)
     mPlayer.move(movement * deltaTime.asSeconds());
 }
 
-void Game::updateStatistics(sf::Time elapsedTime)
-{
-    mStatisticsUpdateTime += elapsedTime;
-    mStatisticsNumFrames += 1;
-
-    if (mStatisticsUpdateTime > sf::seconds(1.0f))
-    {
-        mStatisticsText.setString(
-                "Frames / Second = " + std::to_string(mStatisticsNumFrames) + "\n" +
-                "Time / Update = " + std::to_string(mStatisticsUpdateTime.asMicroseconds() / mStatisticsNumFrames) + "us");
-
-        mStatisticsUpdateTime -= sf::seconds(1.0f);
-        mStatisticsNumFrames = 0;
-    }
-}
-
 void Game::render()
 {
     mWindow.clear();
     mWindow.draw(mPlayer);
     mWindow.draw(mStatisticsText);
     mWindow.display();
-}
-
-
-int main() {
-    Game game;
-    game.run();
 }
 

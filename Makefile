@@ -1,8 +1,13 @@
-TARGET ?= main.cc
-OUTPUT ?= main
+GCC = g++
+INC_SFML = /usr/local/Cellar/sfml/2.5.1_1/include
+LIB_SFML = /usr/local/Cellar/sfml/2.5.1_1/lib
+INCLUDE = include/game.hh
 
-LIB_FILES = /usr/local/Cellar/sfml/2.5.1_1/lib
-INCLUDE_FILES = /usr/local/Cellar/sfml/2.5.1_1/include
+TARGET = src/main.cc
+GAME_FILE = src/game.cc
 
-install:
-	g++ $(TARGET) -I $(INCLUDE_FILES) -o $(OUTPUT) -L $(LIB_FILES) -lsfml-graphics -lsfml-window -lsfml-system
+OUTPUT = build/game
+
+all:
+	$(GCC) -I $(INC_SFML) -I $(INCLUDE) $(TARGET) $(GAME_FILE) -o $(OUTPUT) -lsfml-graphics -lsfml-window -lsfml-system
+
